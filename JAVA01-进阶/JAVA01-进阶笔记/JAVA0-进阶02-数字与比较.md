@@ -120,7 +120,7 @@ class Student extends Person {
 | A.add(x)                | 相加     | **生成**A加上X后的对象                   |
 | A.subtract(x)           | 相减     | **生成**A减去X后的对象                   |
 | A.multiply(x)           | 相乘     | **生成**A乘以X后的对象                   |
-| A.divide(x)             | 相除     | 生成A除以X后的对象                       |
+| A.divide(x)             | 相除     | **生成**A除以X后的对象                       |
 | A.remainder(x)          | 取模     | **生成**A%X后的对象                      |
 | A.divideAndRemainder(x) | 余数除法 | **生成**A除以X后的结果和余数**两个对象** |
 | A.pow(x)                | 幂运算   | **生成**A^X后的对象（x为小数时是开方）   |
