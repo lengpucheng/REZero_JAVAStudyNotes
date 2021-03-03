@@ -333,3 +333,34 @@
     }
 ```
 
+
+
+# 四、工具类Collections
+
+`Collecations`是**操作`Collecation`和`Map`接口**的工具类，其中封装了与之相关的**静态方法**：
+
+| 方法                         | 含义         | 描述                                                         |
+| ---------------------------- | ------------ | ------------------------------------------------------------ |
+| reverse(List list)           | **反转**     | 将List集合**反转**                                           |
+| shuffe(List list)            | **随机排序** | 将List集合**随机排序**                                       |
+| sort(List list)              | 自然排序     | 将List集合按照`Comparable`接口排序（**元素需实现此接口**）   |
+| sort(List list,Comparator c) | 自定义排序   | 将List集合按照自定义`Comparator`接口排序                     |
+| swap(l,int a,int b)          | **交换**     | 将List集合i中指定位置a和b的元素交换位置                      |
+| max/min(collection)          | **自然极值** | 返回Collection集合中的按自然排序最大/小值<br>（元素需要实现`Comparable`接口） |
+| max/min(c,comparator)        | 自定义极值   | 返回Collection集合中按自定义`Comparator`接口的最大/小值      |
+| frequency(collection,obj)    | **频数**     | 返回Collection集合中指定元素obj出现的频数                    |
+| copy(dest,src)               | **复制**     | 将Collection集合src中的全部元素复制到dest中<br>（dest的size必须和src一致，可以用null Object填充） |
+| replaceAll(List,old,new)     | **修改**     | 将List集合中**所有的元素old替换为元素new**                   |
+| synchronizedXxx(C)           | **同步方法** | **将集合C变成一个线程安全的同步集合X**                       |
+
+**`synchronizedXXX()`方法实际上在内部重写了`collection`方法并加上了`synchronized`关键字，其支持`collection`和`Map`中的所有实现类。**
+
+## 1. 正确复制
+
+`copy`方法需要**集合大小一致才可复制**（当dest<src时抛出异常，dest>src时会保留dest多余的元素），因此可以直接**使用空对象填充dest**，**且复制后的dest不支持`remove()`方法**
+
+```java
+List dest=Arrays.asList(new Object[src.size()]);
+        Collections.copy(dest,src);
+```
+

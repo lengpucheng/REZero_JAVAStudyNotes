@@ -16,6 +16,8 @@ public class HashSetSample {
     @Test
     public void set(){
        //
+        Set set=new HashSet();
+        set.add("22");
     }
 
 }
