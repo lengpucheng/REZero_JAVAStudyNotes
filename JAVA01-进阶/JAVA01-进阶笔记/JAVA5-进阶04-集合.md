@@ -162,7 +162,7 @@
 
 #### 3.1.1 构造器
 
-`HashSet`无参构造器，默认会构造一个**长度为16的数组**（底层采用的是**HashMap方法存储**）
+`HashSet`无参构造器，默认会构造一个**长度为16的数组**（底层采用的是**HashMap存储**，作为其Key，value均为同一静态Object对象）
 
 #### 3.1.2 添加
 
@@ -197,7 +197,7 @@
 
 # 三、Map接口
 
-`Map`用来存储键值对模式具有映射关系的数据，主要有以下三个实现类（接口）
+`Map`用来存储键值对模式具有映射关系的数据，一般称为**键值对映射表**或**字典集**，主要有以下三个实现类：
 
 | 类/接口  | 含义           | 描述                                                         |
 | -------- | -------------- | ------------------------------------------------------------ |
@@ -207,4 +207,129 @@
 
 + `HashMap`具有子类`LinkedHashMap`，其可以在遍历时按照添加顺序（实现方式同LinkedHashSet，采用双链表），**当频繁遍历时效率更高**
 + `Hashtabl`具有子类`Properties`主要用来处理配置文件，其**key-value均为`String`**
+
+## 1. 通用方法
+
+| 方法               | 含义          | 描述                                                  |
+| ------------------ | ------------- | ----------------------------------------------------- |
+| A.put(k,v)         | **添加/修改** | 在字典集A中**添加/修改**key=value的数据               |
+| A.putAll(M m)      | 添加全部      | 将字典集m中的全部数据**添加到**字典集A中              |
+| A.remove(k)        | **移除**      | 将字典集中key=k的数据移除，并返回其value              |
+| A.clear()          | 清除          | 将字典集A中的全部数据清除（非A=null）                 |
+| A.get(k)           | **获取**      | 获取字典集A中key=k的value                             |
+| A.containsKey(k)   | 判断包含Key   | 判断字典集A中是否存在key=k                            |
+| A.containsValue(v) | 判断包含Value | 判断字典集A中是否存在value=v                          |
+| A.size()           | **获取大小**  | 返回字典集A中所有数据的个数                           |
+| A.isEmpty()        | 判空内容      | 判断字典集A中是否存在数据                             |
+| A.keySet()         | **遍历Key**   | **生成**一个由字典集A中**所有key组成的Set集合**       |
+| A.values()         | **遍历Value** | **生成**一个由字典集A中**所有Value组成的list集合**    |
+| A.entrySet()       | **遍历Entry** | **生成**一个由字典集A中**所有key-value组成的Set集合** |
+
+其中**`Entry`是`Map`的内部接口**，包括以下两个方法
+
+| 方法         | 含义      | 描述                 |
+| ------------ | --------- | -------------------- |
+| A.getKey()   | 获取key   | 获取元素A存储的key   |
+| A.getValue() | 获取value | 获取元素A存储的value |
+| A.setValue() | 设置value | 设置元素A存储的value |
+
+
+
+## 2. HashMap
+
+`HashMap`存储key-value存储时，**`key`不可重复且有序，`value`可重复无序**，其底层实际**存储的是单个`Entry`元素**，key-value均作为`Entry`的属性。其中`Entry`是**无序存储的**。
+
+**作为`key`的类必须重写`hashCode()`和`equals()`方法**
+
+### 2.1 实现方式
+
++ `HashMap`实例化后，会默认创建一个**长度为16的`Entry[]`**
+
++ 调用`put(k,v)`方法后，会**调用`key.hashCode()`计算key的hash值**，并使其**通过散列算法**得到在`Entry[]`数组中**存放位置**。
+  + 若该位置数据为空，则直接添加在此位置上
+  + 若该位置数据不为空，则与**比较该位置上数据的hash值**，若均不同则以链表的方式存放在之后，否则**调用当前对象的`equals()`方法**与已经存在的数据比较
+    + 若返回`true`：**用value替换该位置的value**
+    + 若返回`false`：按链表存储在之后
++ 默认的扩容方式为扩大为**原有的两倍**，并复制原有数据
+
+其中JDK8对实现方式进行了修改：
+
+1. 底层**使用`Node[]`**替代`Entry[]`存储，其是`Entry`的子类
+2. **实例化不会创建数组**，当**第一次调**用`put(k,v)`方法时才**创建**长度16的数组
+3. 当**某一个位置上链表长度>8**且数组长度大于64时，**此索引位置上**的所有数据由链表**变为红黑树存储**
+
+
+
+### 2.2 构造器
+
+当调用构造器时候，会默认调用内部构造器，并给其赋值默认数组长度（默认是16，若使用有参构造，会是大于等于自定义值的最近的一个**2的倍数**）和**负载因子**（默认0.75），通过`数组长度*负载因子`会得到**临界值**（默认12，当**存储元素数量大于此且当前位置不为null时会触发扩容**）
+
+### 2.3 添加
+
+调用`put(k,v)`方法时，会首先判断Key是否为null，若是null则调用`putForNullKey(v)`将其value添加。
+
+否则，计算key的hash值，并调用`forIndex(key,size)`方法**将hash和数组长度做`&`运算**，得出存储位置`index`。
+
+若index位置的元素为null则直接添加，否则进行判断是否添加或替换，若替换则返回之前的对象。否则执行添加：
+
++ **若当前数量大于临界值且当前位置不空，者会调用扩容**，将数组长度扩容为之前两倍，并计算全部元素的位置依次加入新数组中。
++ 否则会直接在尾部以链表（Node）的方式进行插入，当当前位置的**Node长度超过8**并且数**组总长**度不超过**64时**会对数组进行扩容，**否则会将当前位置改为红黑树存储`TreeNode`**
+
+### 2.3 LinkedHashMap
+
+`LinkedHashMap`是`HashMap`的**子类**，其重写了父类的`newNode()`方法，并构建了`Node`的子类`Entry`，在其中存储`before`和`after`的对象，在各个元素间形成双链表记录添加时的先后顺序。
+
+
+
+## 3. TreeMap
+
+`TreeMap`存储键值对，底层实现同TreeSet相似，**要求Key都各都为同一类对象**，且实现`Comparable`接口或自定义`Comparator`接口，底层使用`红黑树`，**会自动按照Key的大小进行排序**。
+
+
+
+## 4. Hashtable
+
+`Hashtable`是一个古老的字典集对象，其早于`Map`接口，所有方法均为同步方法，因此效率低下，后在JDK1.2中被归为`Map`的实现类，使用极少，主要使用其子类`Properties`处理配置文件中的属性
+
+
+
+### 4.1 Properties
+
+`Properties`主要用来处理配置文件，其**key-value均为`String`**，其可以加载文件流来读取文件中的属性值，主要方法如下
+
+| 方法               | 含义           | 描述                                          |
+| ------------------ | -------------- | --------------------------------------------- |
+| A.load(r)          | 加载           | 加载文件流对象，通过其初始化属性A             |
+| A.loadFromXML(i)   | 加载XML        | 加载XML文件对象，通过其初始化属性A            |
+| A.getProperty(K k) | 读取属性       | 读取key为k的属性的值，不存在返回null          |
+| A.getProperty(k,d) | **读取并默认** | 读取key为k的属性的值，**不存在则使用默认值d** |
+
+
+
+### 4.2 读取属性文件
+
+使用`Properties`可以加载属性文件并读取，案例如下（属性文件在src同级目录）
+
+```java
+ public void sample() throws Exception {
+        // 读取文件流
+        FileInputStream fileInputStream = new FileInputStream("map.properties");
+        Properties properties = new Properties();
+        
+        // 加载流对象
+        properties.load(fileInputStream);
+        
+        // 获取
+        String name = properties.getProperty("name");
+        System.out.println(name); // lpc
+        // 获取不存在
+        System.out.println(properties.getProperty("name2")); // null
+        // 获取并设置默认值
+        System.out.println(properties.getProperty("name2","lengpucheng")); // lengpucheng
+        System.out.println(properties.getProperty("name","lengpucheng")); // lpc
+        
+        // 关闭文件流
+        fileInputStream.close();
+    }
+```
 
