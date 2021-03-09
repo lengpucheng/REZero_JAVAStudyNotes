@@ -16,7 +16,7 @@
 4. [Java进阶笔记-常用类库-数字与比较](./JAVA01-进阶/JAVA01-进阶笔记/JAVA0-进阶02-数字与比较.md)
 5. [Java进阶笔记-常用类库-枚举类](./JAVA01-进阶/JAVA01-进阶笔记/JAVA5-进阶03-枚举类.md)
 6. [Java进阶笔记-常用类库-注解](./JAVA01-进阶/JAVA01-进阶笔记/JAVA5-进阶04-注解.md)
-6. [Java进阶笔记-常用类库-集合](./JAVA01-进阶/JAVA01-进阶笔记/JAVA5-进阶05-集合.md)
+6. [Java进阶笔记-常用类库-集合与泛型](./JAVA01-进阶/JAVA01-进阶笔记/JAVA5-进阶05-集合与泛型.md)
 
 + [Java8新特性-lambda表达式](./JAVA01-进阶/JAVA01-进阶笔记/JAVA8-新特性-lambda.md)
 + [Java8新特性-stream流式编程](./JAVA01-进阶/JAVA01-进阶笔记/JAVA8-新特性-stream.md)

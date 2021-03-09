@@ -335,7 +335,7 @@
 
 
 
-# 四、工具类Collections
+# 四、集合工具类Collections
 
 `Collecations`是**操作`Collecation`和`Map`接口**的工具类，其中封装了与之相关的**静态方法**：
 
@@ -355,7 +355,7 @@
 
 **`synchronizedXXX()`方法实际上在内部重写了`collection`方法并加上了`synchronized`关键字，其支持`collection`和`Map`中的所有实现类。**
 
-## 1. 正确复制
+## *. 正确复制
 
 `copy`方法需要**集合大小一致才可复制**（当dest<src时抛出异常，dest>src时会保留dest多余的元素），因此可以直接**使用空对象填充dest**，**且复制后的dest不支持`remove()`方法**
 
@@ -364,3 +364,121 @@ List dest=Arrays.asList(new Object[src.size()]);
         Collections.copy(dest,src);
 ```
 
+
+
+# 五、泛型Generic
+
+`泛型`类似于一个标签，给集合或方法贴上标签后，其之后只能放入或取出**指定类型**的类对象。即在定义类、接口时**标识某个类的属性或方法的类型或返回值为某一个指定类型**，泛型是一个类型，**不能为基本数据类型**。
+
+## 1.泛型结构
+
+### 1.1 泛型类/接口
+
+可以用符号在类中声明某一个泛型，并将其**作为一个类**在类中使用，**其具体类型在声明和实例化时给出**，若**不声明将默认为`Object`**，**当多个泛型时候用`,`分隔**
+
+**异常类不能声明为泛型**
+
+```java
+static class Person<L>{
+        String name;
+        int age;
+        L language;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+
+        public L getLanguage() {
+            return language;
+        }
+
+        public void setLanguage(L language) {
+            this.language = language;
+        }
+    }
+```
+
+JKD7中新添加钻石语法糖，可以在声明中使用泛型后，在实例化时直接使用`<>`
+
+#### 1.1.1 接口/类继承
+
+当接口或类进行继承/实现时，可以将带泛型的父类进行指明，则**不再是一个泛型，变为指定类型**
+
+```java
+static class ChinesePerson extends Person<Chinese>{
+        
+    }
+```
+
+**否则依然是一个泛型结构**,但不一定全部保留
+
+```java
+static class ChineseStudent<T> extends Person<Chinese,T>{
+    // 继承指定了person的其中一个
+}
+```
+
+#### 1.1.2 泛型数组
+
+泛型无法实例化，但可以通过强制的方式，**将Object转换为泛型**
+
+```java
+T[] t=(T[])new Ojbect[10];
+```
+
+
+
+### 1.2. 泛型方法
+
+**泛型方法是独立于类的泛型**，方法中出现泛型结构即可，与类是否为泛型或泛型类型无关。**为避免泛型标签与类名冲突，需要在方法返回值前加上`<>`并在其中指定泛型标签**。
+
+```java
+public static <E> List<E> getList(E[] es) {
+        return Arrays.asList(es);
+    }
+
+public static <E> E get(){
+        return (E)new Object();
+    }
+```
+
+泛型方法的泛型类型将**根据参数或接收的类型来指定泛型类型**
+
+
+
+## 2. 泛型多态与继承
+
+若A是B的父类，`G<T>`为泛型，则
+
++ `G<A>`与`G<B>`不具有子父关系，为并列关系。
+
++ `A<G>`与`B<G>`依然**保持子父类关系**
+
+```java
+List<String> list=new ArrayList<>()
+```
+
+### 2.1 通配符
+
+`?`可以作为通配符，作为并列泛型的公共父类
+
+```java
+List<String> str=new ArrayList<>();
+List<Integer> inter=new ArrayList<>();
+List<?> list;
+list=str;
+list=inter;
+```
+
+但当使用`?`通配时，泛型类中发方法泛型**参数将只能填入`null`**,泛型**返回值将会向上转型为`Object`**
+
+### 2.2 条件泛型
+
+通配符`？`或者是泛型泛型标识可以使用条件来限定泛型类型：
+
++ `<T extend A>`: 参数**必须为A或A的子类**，返回值为A
++ `<T super A>`：参数**必须为A或A的父类**，返回值为`Object`
