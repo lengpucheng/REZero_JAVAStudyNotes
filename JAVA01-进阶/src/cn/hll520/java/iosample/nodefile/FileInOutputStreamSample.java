@@ -44,7 +44,7 @@ public class FileInOutputStreamSample {
 
     @Test
     public void copyTest(){
-        copy(new File(path,"hello.txt"),new File(path,"a"));
+        copy(new File(path,"hello.txt"),new File(path,"hello2.txt"));
     }
 
     public void copy(File file,File newFile){
