@@ -110,16 +110,168 @@ File**文件流是**除基本抽象流之外的**基本节点流**，**其余均
 
 ## 3. 流的操作
 
-在JAVA中数据的IO都是一套标注话的流程，由以下四部构成：
+在JAVA中数据的IO都是一套标注话的流程，由以下**标注四步构成**：
 
-1. **数据源**实例化
+1. **数据源/目标**实例化（**资源实例化**）
 2. 使用数据源**实例化数据流**
-3. 流的操作（`read()`、`writer`）
-4. 调用`close()`关闭流
+3. 流的**操作**（`read()`、`writer`）（**资源的操作**）
+4. 调用`close()`关闭流（**资源的回收**）
 
 
 
 # 三、节点流
+
+基本的节点流为`FileInputStream`/`FileOutputStream`/`FileReader`/`FileWriter`等，基本操作依然和其他流一样
+
+## 1. 字符流FileReader/Writer
+
+字符流用于处理字符\文本数据，**若处理其他非文本数据处理后的目标将异常**
+
+### 1.1 输入流FileReader
+
+直接使用`文件File`进行字符输入流对象进行实例化，可以调用如下方法进行文件读取（输入到内存）：
+
+| 方法         | 参数                           | 返回值                                   | 含义                                                         |
+| ------------ | ------------------------------ | ---------------------------------------- | ------------------------------------------------------------ |
+| A.read()     |                                | `int`:读取的个数<br>到**文件末尾返回-1** | 读取文件A，**每次一个字符**                                  |
+| A.read()     | char[]                         | 同上，读取完毕**下一次为-1**             | 每次读取`char[]`长度<br>为覆盖读取，每次**不会清空数组**为**按顺序覆盖** |
+| ~~A.read()~~ | ~~char[]<br>offset<br>length~~ | ~~同上~~                                 | ~~从offset位置开始，每次读取length长度到char[]中~~           |
+
+### 1.2 输出流FileWriter
+
+使用`文件File`或`文件路径`进行实例化，同时可以使用第二个参数`append`赋值代表是否追加写入
+
++ 若文件/路径对应物理**文件不存在会自动创建**
++ 若文件存在且`append`为**false**将**直接覆盖文件**
++ 若文件存在且`append`为**true将在文件末尾追加写入**
+
+可以使用如下方法将内存中的数据写入文件：
+
+| 方法          | 参数                            | 含义                                                         |
+| ------------- | ------------------------------- | ------------------------------------------------------------ |
+| A.write()     | String                          | 向文件输出流中写入一个字符串                                 |
+| A.write()     | char[]                          | 同上                                                         |
+| ~~A.write()~~ | ~~char[]/String<br>off<br>len~~ | ~~向文件输出流中从字符串/char[]的**off位置开始写入长度为len的字符**~~ |
+
+### 1.3 文本文件复制
+
+```java
+ public void copyFile() {
+        // 1. 数据源/目标实例化
+        File file = new File(path, "hello2.txt");
+        File newFile = new File(path, "helloCopy.txt");
+
+        FileReader fileReader = null;
+        FileWriter fileWriter = null;
+        try {
+            // 2. 实例化 数据流
+            fileReader = new FileReader(file);
+            fileWriter = new FileWriter(newFile);
+
+            // 3. 流操作
+            char[] buff = new char[16]; // 3.1 每次读取大小
+            int len;
+            // 3.2 获取读取长度 并判断是否到尾部 -1
+            while ((len = fileReader.read(buff)) != -1) {
+                // 3.3 写入读取的长度
+                fileWriter.write(buff, 0, len);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // 4. 关闭流
+            try {
+                if (fileReader != null) {
+                    fileReader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (fileWriter != null) {
+                    fileWriter.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+```
+
+## 2. 字节流FileInputStream/FileOutputStream
+
+字节流可以用于处理任意二进制数据(**包括文本字符**)
+
+但**在处理文本字符时**可能导致**读取的字节恰为某个字符的一部分**，导致字符出现乱码现象。
+
+### 2.1 输入流FileInputStream
+
+直接使用`文件File`进行字节输入流对象进行实例化，可以调用如下方法进行文件读取（输入到内存）：
+
+| 方法         | 参数                           | 返回值                                   | 含义                                                         |
+| ------------ | ------------------------------ | ---------------------------------------- | ------------------------------------------------------------ |
+| A.read()     |                                | `int`:读取的个数<br>到**文件末尾返回-1** | 读取文件A，**每次一个字节**                                  |
+| A.read()     | byte[]                         | 同上，读取完毕**下一次为-1**             | 每次读取`byte[]`长度<br>为覆盖读取，每次**不会清空数组**为**按顺序覆盖** |
+| ~~A.read()~~ | ~~char[]<br>offset<br>length~~ | ~~同上~~                                 | ~~从offset位置开始，每次读取length长度到byte[]中~~           |
+
+### 2.2 输出流FileOutputStream
+
+使用`文件File`或`文件路径`进行实例化，同时可以使用第二个参数`append`赋值代表是否追加写入
+
++ 若文件/路径对应物理**文件不存在会自动创建**
++ 若文件存在且`append`为**false**将**直接覆盖文件**
++ 若文件存在且`append`为**true将在文件末尾追加写入**
+
+可以使用如下方法将内存中的数据写入文件：
+
+| 方法          | 参数                     | 含义                                                         |
+| ------------- | ------------------------ | ------------------------------------------------------------ |
+| A.write()     | byte                     | 向文件输出流中写入一个byte(二进制数 -128~127)                |
+| A.write()     | byte[]                   | 同文件输出流中写入一个byte[]数组                             |
+| ~~A.write()~~ | ~~byte[]<br>off<br>len~~ | ~~向文件输出流中从byte[]的**off位置开始写入长度为len的字符**~~ |
+
+### 2.3 二进制文件复制
+
+也可以复制文本文件，写入和复制都是在进行完毕后因此**字符被中断后又会重新组装**。
+
+```java
+public void copyImage(){
+        // 1. 实例化数据源/目标
+        File file=new File(path,"lpc.jpg");
+        File newFile=new File(path,"lpcCopy.png");
+        FileInputStream inputStream = null;
+        FileOutputStream outputStream= null;
+
+        try {
+            // 2. 流的实例化
+            inputStream = new FileInputStream(file);
+            outputStream = new FileOutputStream(newFile);
+            // 3. 操作流
+            byte[] buff=new byte[16];
+            int len;
+            while((len=inputStream.read(buff))!=-1)
+                outputStream.write(buff,0,len);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // 4. 关闭流
+            try {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+```
 
 
 
