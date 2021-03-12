@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+
+    <title>WTUShop</title>
+    <!-- JQuery -->
+    <script type="text/javascript" src="http://wtushop.hll520.cn:8080/static/js/jquery.min.js"></script>
+    <!-- Bootstrap核心CSS和JS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- 首页样式 -->
+    <link href="https://v3.bootcss.com/examples/cover/cover.css" rel="stylesheet">
+    <!-- 背景 -->
+    <script type="text/javascript">
+        $(function () {
+            /*  从1-10中选择一个当背景  */
+            let mg = Math.floor(Math.random() * 11);
+            $("body").css({
+                "background": "url('http://wtushop.hll520.cn/image/" + mg + ".jpg') no-repeat center",
+                "background-size": "cover",
+                "-webkit-background-size": "cover",
+                "-o-background-size": "cover"
+            });
+        })
+    </script>
+</head>
+
+<body>
+
+<div class="site-wrapper">
+
+    <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+            <div class="masthead clearfix">
+                <div class="inner">
+                    <h3 class="masthead-brand">WTUShop</h3>
+                    <nav>
+                        <ul class="nav masthead-nav">
+                            <li class="active"><a href="#">欢迎页面</a></li>
+                            <li><a href="http://wtushop.hll520.cn:8080/login">用户登录</a></li>
+                            <li><a href="http://wtushop.hll520.cn:8080/register">用户注册</a></li>
+                            <li><a href="http://wtushop.hll520.cn:8080/admin">管理控制台</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="inner cover">
+                <h1 class="cover-heading">Hello WTUShop！</h1>
+                <p class="lead">
+                    使用Bootstrap重构前端布局，视觉效果更加舒适，能够自适应移动端<br/>
+                    利用iframe对控制台进行重塑，导航与业务分隔，效率大幅提升<br/>
+                    同时加入搜索功能，在一个页面即可完成所有操作！
+                </p>
+                <p class="lead">
+                    <a href="http://wtushop.hll520.cn:8080/home" class="btn btn-lg btn-default">进入商城</a>
+                </p>
+            </div>
+
+            <div class="mastfoot">
+                <div class="inner">
+                    <p>Power by <a href="mailto:lpc@hll520.cn">@冷朴承</a> ,Personal Website for <a
+                            href="http://www.hll520.cn">hll520.cn</a></p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>
